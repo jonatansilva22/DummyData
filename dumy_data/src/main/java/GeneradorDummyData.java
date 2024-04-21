@@ -13,7 +13,9 @@ import java.util.Random;
 import javax.swing.*;
 import com.github.javafaker.Faker;
 
-public class GeneradorDatosFicticios extends JFrame {
+
+public class GeneradorDummyData extends JFrame {
+    private JButton botonExportarCSV, botonExportarXML, botonExportarJSON; // Nuevos botones agregados
     private JTextField campoCantidad;
     private JTextArea areaRegistro;
     private JButton botonGenerar, botonExportar;
@@ -21,14 +23,15 @@ public class GeneradorDatosFicticios extends JFrame {
     private Random aleatorio;
     private SimpleDateFormat formatoFecha;
     private List<String[]> datos = new ArrayList<>();
-    private String[] apellidosEspanoles = {"García", "Fernández", "Rodríguez", "González", "López"};
-    private String[] apellidosIngleses = {"O'Neill", "Smith", "Johnson", "D’Angelo", "McDonald"};
-    private String[] apellidosFranceses = {"Lefèvre", "Dupont", "Durand", "Fouquet", "Bélanger"};
-    private String[] apellidosAlemanes = {"Müller", "Schneider", "Fischer", "Weiß", "Köhler"};
+    private String[] apellidosEspanoles = {"Martínez", "López", "González", "Sánchez", "Ramírez"};
+    private String[] apellidosIngleses = {"Williams", "Jones", "Brown", "Taylor", "Davies"};
+    private String[] apellidosFranceses = {"Martin", "Bernard", "Dubois", "Thomas", "Robert"};
+    private String[] apellidosAlemanes = {"Schmidt", "Schneider", "Fischer", "Meyer", "Weber"};
+
     private List<String[]> listasApellidos = new ArrayList<>();
 
-    public GeneradorDatosFicticios() {
-        super("Generador de Datos Ficticios");
+    public GeneradorDummyData() {
+        super("Generador de Dummy Data");
         this.generadorFaker = new Faker(new Locale("es", "ES"));
         this.aleatorio = new Random();
         this.formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
@@ -45,7 +48,7 @@ public class GeneradorDatosFicticios extends JFrame {
         setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Número de Registros:"));
+        panel.add(new JLabel("¿Cuantos registros desea generar?:"));
         campoCantidad = new JTextField(10);
         panel.add(campoCantidad);
 
@@ -56,6 +59,18 @@ public class GeneradorDatosFicticios extends JFrame {
         botonExportar = new JButton("Exportar a SQL");
         botonExportar.addActionListener(this::exportarDatosSQL);
         panel.add(botonExportar);
+
+        botonExportarCSV = new JButton("Exportar a CSV");
+        botonExportarCSV.addActionListener(this::exportarDatosCSV);
+        panel.add(botonExportarCSV);
+
+        botonExportarXML = new JButton("Exportar a XML"); // Nuevo botón para exportar a XML
+        botonExportarXML.addActionListener(this::exportarDatosXML); // Nuevo método para exportar a XML
+        panel.add(botonExportarXML); // Agregar el nuevo botón al panel
+
+        botonExportarJSON = new JButton("Exportar a JSON"); // Nuevo botón para exportar a JSON
+        botonExportarJSON.addActionListener(this::exportarDatosJSON); // Nuevo método para exportar a JSON
+        panel.add(botonExportarJSON); // Agregar el nuevo botón al panel
 
         add(panel, BorderLayout.NORTH);
 
@@ -108,6 +123,42 @@ public class GeneradorDatosFicticios extends JFrame {
         return String.format("22%07d", numeroAleatorio);
     }
 
+    private void exportarDatosCSV(ActionEvent event) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar como");
+        int userSelection = fileChooser.showSaveDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave))) {
+                // Escribir encabezados
+                writer.write("Matrícula,Apellido1,Apellido2,Nombres,Correo,Fecha Nacimiento");
+                writer.newLine();
+                // Escribir datos
+                for (String[] registro : datos) {
+                    String csvLine = String.join(",", registro);
+                    writer.write(csvLine);
+                    writer.newLine();
+                }
+                JOptionPane.showMessageDialog(this, "Datos exportados en CSV exitosamente a " + fileToSave.getAbsolutePath(), "Exportación Exitosa", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // Método para exportar a XML
+    private void exportarDatosXML(ActionEvent event) {
+        // Lógica para exportar a XML
+        JOptionPane.showMessageDialog(this, "Funcionalidad de exportación a XML aún no implementada.", "Funcionalidad Pendiente", JOptionPane.WARNING_MESSAGE);
+    }
+
+    // Método para exportar a JSON
+    private void exportarDatosJSON(ActionEvent event) {
+        // Lógica para exportar a JSON
+        JOptionPane.showMessageDialog(this, "Funcionalidad de exportación a JSON aún no implementada.", "Funcionalidad Pendiente", JOptionPane.WARNING_MESSAGE);
+    }
+
     private void exportarDatosSQL(ActionEvent event) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar como");
@@ -121,7 +172,7 @@ public class GeneradorDatosFicticios extends JFrame {
                 for (int i = 0; i < datos.size(); i++) {
                     String[] registro = datos.get(i);
                     String sqlValue = String.format("('%s', '%s', '%s', '%s', '%s', '%s')",
-                                                    registro[0], registro[1], registro[2], registro[3], registro[4], registro[5]);
+                            registro[0], registro[1], registro[2], registro[3], registro[4], registro[5]);
                     if (i < datos.size() - 1) sqlValue += ",";
                     else sqlValue += ";";
                     writer.write(sqlValue);
@@ -135,6 +186,6 @@ public class GeneradorDatosFicticios extends JFrame {
     }
 
     public static void main(String[] args) {
-        new GeneradorDatosFicticios();
+        new GeneradorDummyData();
     }
 }
